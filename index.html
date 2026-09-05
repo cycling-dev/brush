@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Brush</title>
+<meta name="description" content="A silent 3-minute guided toothbrushing timer.">
+<meta name="theme-color" content="#0d1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Brush">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icons/icon-180.png">
+<link rel="icon" href="./icons/icon-192.png" type="image/png">
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body data-state="idle">
+
+<div id="flash" aria-hidden="true"></div>
+
+<main class="app">
+
+  <!-- ── Idle ───────────────────────────────────────────────── -->
+  <section class="screen screen--idle">
+    <div class="brandmark" aria-hidden="true">
+      <svg viewBox="0 0 100 100" width="72" height="72">
+        <path d="M50 22c-9 0-13-5-22-5-9 0-16 6-16 17 0 14 5 20 8 30 3 9 5 19 12 19 6 0 6-9 18-9s12 9 18 9c7 0 9-10 12-19 3-10 8-16 8-30 0-11-7-17-16-17-9 0-13 5-22 5z"
+              fill="currentColor"/>
+      </svg>
+    </div>
+    <h1 class="brand">Brush</h1>
+    <p class="tagline">3 minutes &middot; 12 zones</p>
+    <button id="btn-start" class="btn btn--primary" type="button">Start</button>
+  </section>
+
+  <!-- ── Running / Paused ───────────────────────────────────── -->
+  <section class="screen screen--run">
+
+    <ol id="dots" class="dots" aria-hidden="true"></ol>
+
+    <div class="diagram-wrap">
+      <svg class="diagram" viewBox="0 0 200 174" role="img" aria-label="Diagram of the mouth showing the area to brush">
+        <g class="arches" fill="none" stroke-linecap="round">
+
+          <!-- Upper jaw -->
+          <path class="seg" id="seg-upper-outside-left" d="M 32.4 73.9 A 70 46 0 0 1 100 16"/>
+          <path class="seg" id="seg-upper-outside-right" d="M 100 16 A 70 46 0 0 1 167.6 73.9"/>
+          <path class="seg" id="seg-upper-chewing-left" d="M 44 71.3 A 58 36 0 0 1 100 26"/>
+          <path class="seg" id="seg-upper-chewing-right" d="M 100 26 A 58 36 0 0 1 156 71.3"/>
+          <path class="seg" id="seg-upper-inside-left" d="M 55.6 68.7 A 46 26 0 0 1 100 36"/>
+          <path class="seg" id="seg-upper-inside-right" d="M 100 36 A 46 26 0 0 1 144.4 68.7"/>
+
+          <!-- Lower jaw -->
+          <path class="seg" id="seg-lower-outside-left" d="M 32.4 100.1 A 70 46 0 0 0 100 158"/>
+          <path class="seg" id="seg-lower-outside-right" d="M 100 158 A 70 46 0 0 0 167.6 100.1"/>
+          <path class="seg" id="seg-lower-chewing-left" d="M 44 102.7 A 58 36 0 0 0 100 148"/>
+          <path class="seg" id="seg-lower-chewing-right" d="M 100 148 A 58 36 0 0 0 156 102.7"/>
+          <path class="seg" id="seg-lower-inside-left" d="M 55.6 105.3 A 46 26 0 0 0 100 138"/>
+          <path class="seg" id="seg-lower-inside-right" d="M 100 138 A 46 26 0 0 0 144.4 105.3"/>
+
+        </g>
+      </svg>
+    </div>
+
+    <div class="readout" role="status" aria-live="polite">
+      <p id="zone" class="zone">Lower Inside</p>
+      <p id="side" class="side">Left</p>
+    </div>
+
+    <div class="count">
+      <span id="secs" class="secs">15</span>
+      <div class="bar"><div id="bar-fill" class="bar__fill"></div></div>
+      <p id="total" class="total">3:00 left</p>
+    </div>
+
+    <div class="controls">
+      <button id="btn-pause" class="btn btn--ghost" type="button">Pause</button>
+      <button id="btn-stop" class="btn btn--quiet" type="button">Stop</button>
+    </div>
+
+    <div class="paused-veil" aria-hidden="true"><span>Paused</span></div>
+  </section>
+
+  <!-- ── Done ───────────────────────────────────────────────── -->
+  <section class="screen screen--done">
+    <div class="tick" aria-hidden="true">
+      <svg viewBox="0 0 100 100" width="88" height="88">
+        <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="5" opacity="0.35"/>
+        <path d="M30 52 L44 66 L71 36" fill="none" stroke="currentColor" stroke-width="8"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h2 class="done-title">All clean</h2>
+    <p class="tagline">Every surface, 3 minutes.</p>
+    <button id="btn-again" class="btn btn--primary" type="button">Start again</button>
+  </section>
+
+</main>
+
+<script src="./app.js"></script>
+</body>
+</html>

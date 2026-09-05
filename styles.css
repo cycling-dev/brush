@@ -1,0 +1,229 @@
+/* ── Reset / base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --zone: #0d1117;          /* current zone colour, set from JS      */
+  --ink:  #ffffff;
+  --dim:  rgba(255, 255, 255, 0.62);
+  --faint: rgba(255, 255, 255, 0.18);
+}
+
+html { height: 100%; }
+
+body {
+  min-height: 100%;
+  background: var(--zone);
+  color: var(--ink);
+  font: 400 16px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 450ms ease;
+  overscroll-behavior: none;
+  touch-action: manipulation;              /* no double-tap zoom */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  overflow: hidden;
+}
+
+/* ── Shell ────────────────────────────────────────────────── */
+.app {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  padding:
+    calc(env(safe-area-inset-top) + 16px)
+    calc(env(safe-area-inset-right) + 20px)
+    calc(env(safe-area-inset-bottom) + 20px)
+    calc(env(safe-area-inset-left) + 20px);
+}
+
+.screen { display: none; flex: 1; flex-direction: column; align-items: center; }
+
+body[data-state="idle"]   .screen--idle { display: flex; }
+body[data-state="running"] .screen--run,
+body[data-state="paused"]  .screen--run { display: flex; }
+body[data-state="done"]   .screen--done { display: flex; }
+
+/* ── Idle & done screens ──────────────────────────────────── */
+.screen--idle, .screen--done { justify-content: center; gap: 4px; text-align: center; }
+
+.brandmark, .tick { color: var(--ink); opacity: 0.9; margin-bottom: 10px; }
+
+.brand      { font-size: 44px; font-weight: 700; letter-spacing: -0.02em; }
+.done-title { font-size: 38px; font-weight: 700; letter-spacing: -0.02em; }
+.tagline    { color: var(--dim); font-size: 16px; margin-bottom: 40px; }
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.btn {
+  font: inherit;
+  font-weight: 600;
+  color: var(--ink);
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: transform 120ms ease, background-color 160ms ease;
+}
+.btn:active { transform: scale(0.96); }
+
+.btn--primary {
+  width: 168px; height: 168px;
+  border-radius: 50%;
+  font-size: 26px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 2px solid rgba(255, 255, 255, 0.55);
+}
+
+.btn--ghost {
+  min-width: 150px;
+  padding: 17px 30px;
+  font-size: 18px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.btn--quiet {
+  padding: 17px 24px;
+  font-size: 16px;
+  color: var(--dim);
+  background: transparent;
+}
+
+/* ── Progress dots ────────────────────────────────────────── */
+.dots { display: flex; gap: 7px; list-style: none; margin-bottom: 6px; }
+
+.dots li {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--faint);
+  transition: background-color 200ms ease, transform 200ms ease;
+}
+.dots li.done { background: rgba(255, 255, 255, 0.45); }
+.dots li.now  { background: var(--ink); transform: scale(1.5); }
+
+/* ── Mouth diagram ────────────────────────────────────────── */
+.diagram-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0;
+}
+
+.diagram { width: 100%; max-width: 340px; height: 100%; max-height: 300px; }
+
+.seg {
+  stroke: var(--faint);
+  stroke-width: 9;
+  transition: stroke 200ms ease, stroke-width 200ms ease, opacity 200ms ease;
+}
+
+.seg.on {
+  stroke: var(--ink);
+  stroke-width: 13;
+  filter: drop-shadow(0 0 9px rgba(255, 255, 255, 0.65));
+}
+
+/* ── Readout ──────────────────────────────────────────────── */
+.readout { text-align: center; margin-top: 2px; }
+
+.zone {
+  font-size: clamp(26px, 8vw, 34px);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+}
+.side { color: var(--dim); font-size: 18px; margin-top: 3px; }
+
+/* ── Countdown ────────────────────────────────────────────── */
+.count { width: 100%; max-width: 320px; text-align: center; margin-top: 18px; }
+
+.secs {
+  display: block;
+  font-size: 60px;
+  font-weight: 300;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+
+.bar {
+  height: 4px;
+  margin: 14px 0 8px;
+  border-radius: 999px;
+  background: var(--faint);
+  overflow: hidden;
+}
+.bar__fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: var(--ink);
+}
+
+.total { color: var(--dim); font-size: 14px; font-variant-numeric: tabular-nums; }
+
+/* ── Controls ─────────────────────────────────────────────── */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+/* ── Paused veil ──────────────────────────────────────────── */
+.paused-veil {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+body[data-state="paused"] .paused-veil { display: flex; }
+
+/* ── Zone-change flash ────────────────────────────────────── */
+#flash {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+}
+#flash.go { animation: blink 620ms ease-out both; }
+
+@keyframes blink {
+  0%   { opacity: 0.85; }
+  22%  { opacity: 0; }
+  44%  { opacity: 0.85; }
+  100% { opacity: 0; }
+}
+
+/* The flash is the app's only alert, so soften it rather than remove it. */
+@media (prefers-reduced-motion: reduce) {
+  body { transition: none; }
+  .btn:active { transform: none; }
+  #flash.go { animation: blink-soft 620ms ease-out both; }
+  @keyframes blink-soft {
+    0%   { opacity: 0.4; }
+    100% { opacity: 0; }
+  }
+}
+
+/* ── Short screens (e.g. iPhone SE) ───────────────────────── */
+@media (max-height: 700px) {
+  .diagram { max-height: 210px; }
+  .secs { font-size: 48px; }
+  .count { margin-top: 8px; }
+  .controls { margin-top: 12px; }
+  .btn--primary { width: 148px; height: 148px; }
+}
