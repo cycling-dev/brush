@@ -3,18 +3,31 @@
 A silent, guided 3-minute toothbrushing timer, built as a Progressive Web App
 so it can live on the iPhone home screen without an App Store account.
 
-Press **Start** and it walks through **12 zones × 15 seconds**. At every switch
+Press **Start** and it walks through **12 zones in 3 minutes**. At every switch
 the screen flashes and the background colour changes; a diagram of the two tooth
 arches highlights the exact surface, jaw and side to brush. No sound, ever.
 
-| # | Zone | # | Zone |
+Zones are not all the same length — the insides and outsides carry most of the
+plaque, so the chewing surfaces give time up to them:
+
+| Surface | Zones | Each | Subtotal |
 |---|---|---|---|
-| 1 | Lower Inside — Left | 7 | Upper Outside — Left |
-| 2 | Lower Inside — Right | 8 | Upper Outside — Right |
-| 3 | Upper Inside — Left | 9 | Lower Chewing — Left |
-| 4 | Upper Inside — Right | 10 | Lower Chewing — Right |
-| 5 | Lower Outside — Left | 11 | Upper Chewing — Left |
-| 6 | Lower Outside — Right | 12 | Upper Chewing — Right |
+| Inside | 4 | 17s | 68s |
+| Outside | 4 | 18s | 72s |
+| Chewing | 4 | 10s | 40s |
+| | | | **180s = 3:00** |
+
+| # | Zone | Length | # | Zone | Length |
+|---|---|---|---|---|---|
+| 1 | Lower Inside — Left | 17s | 7 | Upper Outside — Left | 18s |
+| 2 | Lower Inside — Right | 17s | 8 | Upper Outside — Right | 18s |
+| 3 | Upper Inside — Left | 17s | 9 | Lower Chewing — Left | 10s |
+| 4 | Upper Inside — Right | 17s | 10 | Lower Chewing — Right | 10s |
+| 5 | Lower Outside — Left | 18s | 11 | Upper Chewing — Left | 10s |
+| 6 | Lower Outside — Right | 18s | 12 | Upper Chewing — Right | 10s |
+
+To retune, edit the one `SECONDS` table at the top of `app.js`; everything else
+follows from it.
 
 ## Files
 
@@ -39,8 +52,9 @@ python3 -m http.server 8000
 Then open <http://localhost:8000>. `localhost` counts as a secure origin, so the
 service worker and offline behaviour work there just like on the live site.
 
-Add `?s=1` to the URL (<http://localhost:8000/?s=1>) to shorten each zone to one
-second — all 12 transitions in 12 seconds instead of three minutes.
+Add `?x=15` to the URL (<http://localhost:8000/?x=15>) to run everything 15 times
+faster — the whole session in 12 seconds instead of three minutes. It scales the
+zone lengths rather than flattening them, so the uneven timings still apply.
 
 ## Deploying an update
 

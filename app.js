@@ -4,6 +4,9 @@
  * interval ticks: iOS throttles and suspends timers whenever the screen sleeps
  * or you switch apps, so tick counting would drift. Working from Date.now()
  * means the app shows the correct zone the instant you look back at it.
+ *
+ * Zones are not all the same length, so every position is resolved against a
+ * precomputed table of start offsets rather than by dividing by a step size.
  */
 (function () {
   'use strict';
@@ -29,11 +32,31 @@
     { jaw: 'upper', surface: 'chewing', side: 'right', colour: '#4a1f45' }
   ];
 
-  /* ?s=1 shortens each zone to one second, so all 12 transitions can be
-   * watched in 12 seconds while testing. Not surfaced in the UI. */
-  var override = parseFloat(new URLSearchParams(location.search).get('s'));
-  var STEP_MS = (override > 0 ? override : 15) * 1000;
-  var TOTAL_MS = STEP_MS * ZONES.length;
+  /* Seconds per zone, by surface. The insides and outsides carry most of the
+   * plaque and get the time the chewing surfaces give up; with four zones of
+   * each surface this balances exactly, so the session is still 3:00:
+   * 4x17 + 4x18 + 4x10 = 68 + 72 + 40 = 180. */
+  var SECONDS = { inside: 17, outside: 18, chewing: 10 };
+
+  /* ?x=15 runs everything 15 times faster, so the whole session can be watched
+   * in 12 seconds while testing. It scales the durations rather than flattening
+   * them, so the uneven zone lengths are still exercised. Not surfaced in the UI. */
+  var speed = parseFloat(new URLSearchParams(location.search).get('x'));
+  if (!(speed > 0)) speed = 1;
+
+  /* Zone lengths and the running start time of each, worked out once up front. */
+  var DURATIONS = ZONES.map(function (z) { return SECONDS[z.surface] * 1000 / speed; });
+  var OFFSETS = [];
+  var TOTAL_MS = DURATIONS.reduce(function (acc, ms) { OFFSETS.push(acc); return acc + ms; }, 0);
+
+  /* Which zone is running at a given elapsed time. Twelve entries, so a plain
+   * scan from the end is both the clearest and the fastest thing here. */
+  function stepAt(ms) {
+    for (var i = ZONES.length - 1; i > 0; i--) {
+      if (ms >= OFFSETS[i]) return i;
+    }
+    return 0;
+  }
 
   var IDLE_COLOUR = '#0d1117';
 
@@ -127,16 +150,17 @@
 
     if (state === 'running' && e >= TOTAL_MS) { finish(); return; }
 
-    var i = Math.min(Math.floor(e / STEP_MS), ZONES.length - 1);
+    var i = stepAt(e);
     if (i !== shownStep) {
       shownStep = i;
       showStep(i);
       flash();
     }
 
-    var into = e - i * STEP_MS;
-    el.secs.textContent = String(Math.max(0, Math.ceil((STEP_MS - into) / 1000)));
-    el.bar.style.width = (into / STEP_MS) * 100 + '%';
+    var into = e - OFFSETS[i];
+    var span = DURATIONS[i];
+    el.secs.textContent = String(Math.max(0, Math.ceil((span - into) / 1000)));
+    el.bar.style.width = (into / span) * 100 + '%';
     el.total.textContent = mmss(TOTAL_MS - e) + ' left';
   }
 
