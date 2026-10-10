@@ -8,7 +8,7 @@
  *
  * CACHE only needs bumping to force every phone to discard its copy at once.
  */
-var CACHE = 'brush-v2';
+var CACHE = 'brush-v3';
 
 var SHELL = [
   './',

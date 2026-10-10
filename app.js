@@ -467,6 +467,40 @@
 
   setColour(IDLE_COLOUR);
 
+  /* ── Home-screen height (iOS) ───────────────────────────── */
+  /* Launched from the home screen, iOS sometimes lays the page out on a cold
+   * start as if Safari's toolbar were still there, leaving an empty band at
+   * the bottom until the phone is rotated. In that mode the app always fills
+   * the whole screen, so the screen's height is a safe floor. iOS also
+   * corrects itself late, so measure again shortly after launch and whenever
+   * the app comes back. navigator.standalone exists only on iOS, which keeps
+   * this away from Android, where the screen includes system bars. */
+  var appEl = document.querySelector('.app');
+
+  function fitHeight() {
+    var vv = window.visualViewport;
+    var h = Math.max(window.innerHeight, vv ? vv.height : 0);
+    var landscape = window.innerWidth > window.innerHeight;
+    var screenSide = landscape
+      ? Math.min(screen.width, screen.height)
+      : Math.max(screen.width, screen.height);
+    /* A toolbar's worth short means the bug; much shorter means the app
+     * really is in a smaller window (iPad split view), so leave it be. */
+    if (screenSide > h && screenSide - h < 160) h = screenSide;
+    appEl.style.minHeight = h + 'px';
+  }
+
+  if (navigator.standalone === true) {
+    fitHeight();
+    [300, 1000, 2500].forEach(function (ms) { setTimeout(fitHeight, ms); });
+    window.addEventListener('resize', fitHeight);
+    window.addEventListener('orientationchange', fitHeight);
+    window.addEventListener('pageshow', fitHeight);
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'visible') fitHeight();
+    });
+  }
+
   /* ── Offline support ────────────────────────────────────── */
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {

@@ -92,7 +92,7 @@ The phone picks the update up on its own. The service worker serves the cached
 copy instantly and refetches in the background, so the launch *after* next shows
 the new version — open the app twice to see a change straight away.
 
-Only bump `CACHE` in `sw.js` (currently `brush-v2` → `brush-v3`) if you ever
+Only bump `CACHE` in `sw.js` (currently `brush-v3` → `brush-v4`) if you ever
 need every phone to throw its copy away immediately. Day to day you can ignore it.
 
 iOS keeps the home-screen icon it saw when you added the app. To see a new
@@ -107,6 +107,10 @@ Open the live URL **in Safari** (Chrome on iOS cannot install PWAs) → **Share*
 
 - iOS Safari has no vibration API, so the app cannot buzz the phone. All feedback
   is visual by necessity.
+- Opened from the home screen, iOS can lay the page out on a cold start as if
+  Safari's toolbar were still there, leaving an empty band at the bottom until
+  the phone is rotated. `styles.css` uses `100vh` in that mode and `app.js`
+  sets the screen height as a floor, measuring again shortly after launch.
 - The countdown is computed from a wall-clock timestamp rather than by counting
   interval ticks, because iOS suspends timers when the screen sleeps. Come back
   to the app mid-session and it shows the correct zone immediately.

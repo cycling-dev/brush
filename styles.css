@@ -60,6 +60,11 @@ body[data-state="idle"] {
 }
 
 /* ── Shell ────────────────────────────────────────────────── */
+/* In Safari, 100dvh tracks the toolbars as they show and hide. On the home
+ * screen there are no toolbars, but iOS can size 100dvh on a cold start as if
+ * there were, leaving an empty band at the bottom until the phone is rotated;
+ * 100vh ignores toolbars, so it is right there from the first frame. app.js
+ * adds a screen-size floor on top, in case a future iOS gets that wrong too. */
 .app {
   position: relative;
   min-height: 100vh;
@@ -70,6 +75,10 @@ body[data-state="idle"] {
     calc(env(safe-area-inset-right) + 24px)
     calc(env(safe-area-inset-bottom) + 20px)
     calc(env(safe-area-inset-left) + 24px);
+}
+
+@media (display-mode: standalone) {
+  .app { min-height: 100vh; }
 }
 
 .screen {
