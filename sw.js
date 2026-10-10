@@ -8,7 +8,7 @@
  *
  * CACHE only needs bumping to force every phone to discard its copy at once.
  */
-var CACHE = 'brush-v1';
+var CACHE = 'brush-v2';
 
 var SHELL = [
   './',
@@ -16,6 +16,8 @@ var SHELL = [
   './styles.css',
   './app.js',
   './manifest.json',
+  './fonts/pixelify-sans-latin.woff2',
+  './fonts/jetbrains-mono-latin.woff2',
   './icons/icon-180.png',
   './icons/icon-192.png',
   './icons/icon-512.png',

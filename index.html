@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Brush</title>
 <meta name="description" content="A silent 3-minute guided toothbrushing timer.">
-<meta name="theme-color" content="#0d1117">
+<meta name="theme-color" content="#14110f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Brush">
@@ -13,6 +13,8 @@
 <link rel="manifest" href="./manifest.json">
 <link rel="apple-touch-icon" href="./icons/icon-180.png">
 <link rel="icon" href="./icons/icon-192.png" type="image/png">
+<link rel="preload" href="./fonts/pixelify-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="./fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="./styles.css">
 </head>
 <body data-state="idle">
@@ -23,77 +25,138 @@
 
   <!-- ── Idle ───────────────────────────────────────────────── -->
   <section class="screen screen--idle">
-    <div class="brandmark" aria-hidden="true">
-      <svg viewBox="0 0 100 100" width="72" height="72">
-        <path d="M50 22c-9 0-13-5-22-5-9 0-16 6-16 17 0 14 5 20 8 30 3 9 5 19 12 19 6 0 6-9 18-9s12 9 18 9c7 0 9-10 12-19 3-10 8-16 8-30 0-11-7-17-16-17-9 0-13 5-22 5z"
-              fill="currentColor"/>
-      </svg>
+    <div class="welcome">
+      <p class="welcome__title"><span class="welcome__star" aria-hidden="true">✻</span>Welcome to Brush!</p>
+      <p class="welcome__line">silent 3-minute guided timer</p>
+      <p class="welcome__line">cwd: ~/mouth</p>
     </div>
-    <h1 class="brand">Brush</h1>
-    <p class="tagline">3 minutes &middot; 12 zones</p>
-    <button id="btn-start" class="btn btn--primary" type="button">Start</button>
+
+    <div class="hero">
+      <div class="tile-wrap">
+        <div class="tile">
+          <svg id="tooth-idle" class="sprite sprite--idle" viewBox="0 0 16 16" shape-rendering="crispEdges" role="img" aria-label="Pixel tooth mascot"></svg>
+        </div>
+        <svg class="sparkle sparkle--a" viewBox="0 0 3 3" shape-rendering="crispEdges" aria-hidden="true"><path d="M1 0h1v3H1zM0 1h3v1H0z"/></svg>
+        <svg class="sparkle sparkle--b" viewBox="0 0 3 3" shape-rendering="crispEdges" aria-hidden="true"><path d="M1 0h1v3H1zM0 1h3v1H0z"/></svg>
+        <svg class="sparkle sparkle--c" viewBox="0 0 3 3" shape-rendering="crispEdges" aria-hidden="true"><path d="M1 0h1v3H1zM0 1h3v1H0z"/></svg>
+      </div>
+      <h1 class="wordmark" aria-label="Brush"><span>B</span><span>R</span><span>U</span><span>S</span><span>H</span></h1>
+      <p id="idle-meta" class="meta">3:00 · 12 zones · 3 surfaces</p>
+    </div>
+
+    <div class="legend" aria-hidden="true">
+      <ol id="legend" class="legend__strip"></ol>
+      <p class="legend__labels"><span>INSIDE</span><span>OUTSIDE</span><span>CHEWING</span></p>
+    </div>
+
+    <button id="btn-start" class="btn btn--start" type="button">
+      <svg width="12" height="21" viewBox="0 0 4 7" shape-rendering="crispEdges" aria-hidden="true"><path d="M0 0h1v7H0zM1 1h1v5H1zM2 2h1v3H2zM3 3h1v1H3z"/></svg>
+      START
+    </button>
+
+    <p class="hint"><span class="hint__prompt" aria-hidden="true">›</span>tap start, then follow the colour<span class="hint__cursor" aria-hidden="true"></span></p>
   </section>
 
   <!-- ── Running / Paused ───────────────────────────────────── -->
   <section class="screen screen--run">
 
-    <ol id="dots" class="dots" aria-hidden="true"></ol>
+    <header class="topbar">
+      <span class="topbar__brand">BRUSH</span>
+      <span class="topbar__zone">ZONE <span id="zone-no">01</span>/12</span>
+    </header>
 
-    <div class="diagram-wrap">
-      <svg class="diagram" viewBox="0 0 200 174" role="img" aria-label="Diagram of the mouth showing the area to brush">
-        <g class="arches" fill="none" stroke-linecap="round">
+    <ol id="steps" class="steps" aria-hidden="true"></ol>
 
-          <!-- Upper jaw -->
-          <path class="seg" id="seg-upper-outside-left" d="M 32.4 73.9 A 70 46 0 0 1 100 16"/>
-          <path class="seg" id="seg-upper-outside-right" d="M 100 16 A 70 46 0 0 1 167.6 73.9"/>
-          <path class="seg" id="seg-upper-chewing-left" d="M 44 71.3 A 58 36 0 0 1 100 26"/>
-          <path class="seg" id="seg-upper-chewing-right" d="M 100 26 A 58 36 0 0 1 156 71.3"/>
-          <path class="seg" id="seg-upper-inside-left" d="M 55.6 68.7 A 46 26 0 0 1 100 36"/>
-          <path class="seg" id="seg-upper-inside-right" d="M 100 36 A 46 26 0 0 1 144.4 68.7"/>
-
-          <!-- Lower jaw -->
-          <path class="seg" id="seg-lower-outside-left" d="M 32.4 100.1 A 70 46 0 0 0 100 158"/>
-          <path class="seg" id="seg-lower-outside-right" d="M 100 158 A 70 46 0 0 0 167.6 100.1"/>
-          <path class="seg" id="seg-lower-chewing-left" d="M 44 102.7 A 58 36 0 0 0 100 148"/>
-          <path class="seg" id="seg-lower-chewing-right" d="M 100 148 A 58 36 0 0 0 156 102.7"/>
-          <path class="seg" id="seg-lower-inside-left" d="M 55.6 105.3 A 46 26 0 0 0 100 138"/>
-          <path class="seg" id="seg-lower-inside-right" d="M 100 138 A 46 26 0 0 0 144.4 105.3"/>
-
-        </g>
+    <div class="map-wrap">
+      <svg id="map" class="map" viewBox="0 0 319 259" shape-rendering="crispEdges" role="img" aria-label="Mouth map showing the area to brush">
+        <text id="map-left" class="map__side" x="0" y="134">L</text>
+        <text id="map-right" class="map__side" x="319" y="134" text-anchor="end">R</text>
       </svg>
     </div>
 
     <div class="readout" role="status" aria-live="polite">
-      <p id="zone" class="zone">Lower Inside</p>
-      <p id="side" class="side">Left</p>
+      <div class="chips">
+        <span id="jaw" class="chip chip--jaw">LOWER JAW</span>
+        <span id="side-chip" class="chip chip--side" data-side="left">
+          <svg class="chip__arrow" width="8" height="14" viewBox="0 0 4 7" shape-rendering="crispEdges" aria-hidden="true"><path d="M3 0h1v7H3zM2 1h1v5H2zM1 2h1v3H1zM0 3h1v1H0z"/></svg>
+          <span id="side">LEFT</span>
+        </span>
+      </div>
+      <p id="surface" class="surface">INSIDE</p>
     </div>
 
     <div class="count">
-      <span id="secs" class="secs">15</span>
-      <div class="bar"><div id="bar-fill" class="bar__fill"></div></div>
-      <p id="total" class="total">3:00 left</p>
+      <p class="secs"><span id="secs" class="secs__num">17</span><span class="secs__unit">s</span></p>
+      <p class="total"><span id="total" class="total__time">3:00</span><span class="total__label">TOTAL LEFT</span></p>
     </div>
+
+    <ol id="ticks" class="ticks" aria-hidden="true"></ol>
+
+    <p class="status" aria-hidden="true"><span id="spinner" class="status__spinner">✻</span><span id="status">Scrubbing…</span></p>
 
     <div class="controls">
-      <button id="btn-pause" class="btn btn--ghost" type="button">Pause</button>
-      <button id="btn-stop" class="btn btn--quiet" type="button">Stop</button>
+      <button id="btn-pause" class="btn btn--pause" type="button">
+        <svg width="15" height="21" viewBox="0 0 5 7" shape-rendering="crispEdges" aria-hidden="true"><path d="M0 0h2v7H0zM3 0h2v7H3z"/></svg>
+        PAUSE
+      </button>
+      <button id="btn-stop" class="btn btn--stop" type="button">
+        <svg width="13" height="13" viewBox="0 0 1 1" shape-rendering="crispEdges" aria-hidden="true"><path d="M0 0h1v1H0z"/></svg>
+        STOP
+      </button>
     </div>
 
-    <div class="paused-veil" aria-hidden="true"><span>Paused</span></div>
+    <div class="veil">
+      <div class="veil__box">
+        <div class="veil__head">
+          <svg class="veil__icon" width="25" height="35" viewBox="0 0 5 7" shape-rendering="crispEdges" aria-hidden="true"><path d="M0 0h2v7H0zM3 0h2v7H3z"/></svg>
+          <h2 class="veil__title">PAUSED</h2>
+        </div>
+        <p id="veil-zone" class="veil__line">zone 01/12</p>
+        <p id="veil-left" class="veil__line">3:00 left · clock is frozen</p>
+      </div>
+      <button id="btn-resume" class="btn btn--resume" type="button">
+        <svg width="12" height="21" viewBox="0 0 4 7" shape-rendering="crispEdges" aria-hidden="true"><path d="M0 0h1v7H0zM1 1h1v5H1zM2 2h1v3H2zM3 3h1v1H3z"/></svg>
+        RESUME
+      </button>
+      <button id="btn-reset" class="btn btn--link" type="button">› stop &amp; reset</button>
+    </div>
   </section>
 
   <!-- ── Done ───────────────────────────────────────────────── -->
   <section class="screen screen--done">
-    <div class="tick" aria-hidden="true">
-      <svg viewBox="0 0 100 100" width="88" height="88">
-        <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="5" opacity="0.35"/>
-        <path d="M30 52 L44 66 L71 36" fill="none" stroke="currentColor" stroke-width="8"
-              stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+    <div id="confetti" class="confetti" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <span class="topbar__brand">BRUSH</span>
+      <span class="topbar__zone">ZONE 12/12 ✓</span>
+    </header>
+
+    <ol id="steps-done" class="steps steps--all" aria-hidden="true"></ol>
+
+    <div class="hero">
+      <div class="tile-wrap tile-wrap--done">
+        <div class="tile tile--done">
+          <svg id="tooth-done" class="sprite sprite--done" viewBox="0 0 16 16" shape-rendering="crispEdges" role="img" aria-label="Pixel tooth mascot, grinning"></svg>
+        </div>
+        <svg class="sparkle sparkle--d" viewBox="0 0 3 3" shape-rendering="crispEdges" aria-hidden="true"><path d="M1 0h1v3H1zM0 1h3v1H0z"/></svg>
+        <svg class="sparkle sparkle--e" viewBox="0 0 3 3" shape-rendering="crispEdges" aria-hidden="true"><path d="M1 0h1v3H1zM0 1h3v1H0z"/></svg>
+        <svg class="sparkle sparkle--f" viewBox="0 0 3 3" shape-rendering="crispEdges" aria-hidden="true"><path d="M1 0h1v3H1zM0 1h3v1H0z"/></svg>
+      </div>
+      <h2 class="done-title">ALL CLEAN!</h2>
+      <p id="done-meta" class="meta meta--done">every surface · 3:00 · 12 zones</p>
     </div>
-    <h2 class="done-title">All clean</h2>
-    <p class="tagline">Every surface, 3 minutes.</p>
-    <button id="btn-again" class="btn btn--primary" type="button">Start again</button>
+
+    <div class="receipt">
+      <p class="receipt__cmd">$ brush --summary</p>
+      <div id="receipt-rows" class="receipt__rows"></div>
+      <p class="receipt__total"><span>total</span><span id="receipt-total">3:00 · 12/12</span></p>
+    </div>
+
+    <button id="btn-again" class="btn btn--again" type="button">
+      <svg width="12" height="21" viewBox="0 0 4 7" shape-rendering="crispEdges" aria-hidden="true"><path d="M0 0h1v7H0zM1 1h1v5H1zM2 2h1v3H2zM3 3h1v1H3z"/></svg>
+      START AGAIN
+    </button>
+    <button id="btn-home" class="btn btn--link" type="button">› back to start</button>
   </section>
 
 </main>

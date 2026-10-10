@@ -1,13 +1,13 @@
 {
   "name": "Brush — guided toothbrushing",
   "short_name": "Brush",
-  "description": "A silent 3-minute guided toothbrushing timer: 12 zones, 15 seconds each.",
+  "description": "A silent 3-minute guided toothbrushing timer: 12 zones, every surface.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0d1117",
-  "theme_color": "#0d1117",
+  "background_color": "#14110f",
+  "theme_color": "#14110f",
   "icons": [
     { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
