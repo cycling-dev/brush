@@ -59,6 +59,11 @@ body[data-state="idle"] {
   background-size: 12px 12px;
 }
 
+/* The page is locked in place while brushing, but should the summary ever be
+ * taller than the screen (a small phone, zoomed text), it scrolls rather than
+ * losing its bottom edge. */
+body[data-state="done"] { overflow-y: auto; }
+
 /* ── Shell ────────────────────────────────────────────────── */
 /* In Safari, 100dvh tracks the toolbars as they show and hide. On the home
  * screen there are no toolbars, but iOS can size 100dvh on a cold start as if
@@ -364,7 +369,15 @@ body[data-state="paused"] .veil { display: flex; }
 .sparkle--e { width: 15px; left: -38px; top: 40px;    fill: var(--cream); }
 .sparkle--f { width: 18px; right: -36px; bottom: 30px; fill: #ee4fa0; }
 
-.done-title { font: 700 62px/1 var(--pixel); letter-spacing: 0.02em; }
+/* Kept to one line: wrapped onto two, the title made the done screen taller
+ * than a 375-point-wide phone and cut off its bottom. 18vw - 10px is the
+ * largest size that still fits the screen's width, with a little to spare. */
+.done-title {
+  font: 700 62px/1 var(--pixel);
+  font-size: min(62px, 18vw - 10px);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
 .meta--done { margin-top: 10px; color: var(--ink); font-weight: 700; }
 
 .receipt {
@@ -538,7 +551,7 @@ body[data-state="paused"] .veil { display: flex; }
   .btn--pause, .btn--stop { height: 56px; }
 
   .tile-wrap--done { width: 150px; margin-bottom: 24px; }
-  .done-title { font-size: 48px; }
+  .done-title { font-size: min(48px, 18vw - 10px); }
   .receipt { gap: 6px; padding: 10px 14px; }
   .receipt__rows { gap: 6px; }
   .btn--again { height: 60px; margin-top: 16px; font-size: 24px; }
@@ -548,6 +561,5 @@ body[data-state="paused"] .veil { display: flex; }
 @media (max-width: 360px) {
   .wordmark { font-size: 64px; }
   .surface { font-size: 52px; }
-  .done-title { font-size: 50px; }
   .btn--stop { width: 104px; }
 }

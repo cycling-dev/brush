@@ -370,6 +370,7 @@
   function setState(next) {
     state = next;
     body.setAttribute('data-state', next);
+    window.scrollTo(0, 0);                  // the summary may have been scrolled
   }
 
   /* ── Screen wake lock (Safari 16.4+) ────────────────────── */
